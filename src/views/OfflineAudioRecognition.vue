@@ -49,7 +49,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getAsrModels, uploadAudio, recognizeAudio } from '../api';
+import { offlineGetAsrModels, offlineUploadAudio, offlineRecognizeAudio } from '../api';
 
 const models = ref([]);
 const selectedModel = ref('');
@@ -59,10 +59,9 @@ const transcription = ref('');
 const isUploading = ref(false);
 const isRecognizing = ref(false);
 
-// 获取模型列表
 const fetchModels = async () => {
   try {
-    const res = await getAsrModels();
+    const res = await offlineGetAsrModels();
     models.value = res.data.models || [];
     if (models.value.length === 0) {
       ElMessage.warning('没有可用的模型');
@@ -72,24 +71,20 @@ const fetchModels = async () => {
   }
 };
 
-// 自定义音频上传
 const customUpload = async (options) => {
   isUploading.value = true;
   try {
     const formData = new FormData();
     formData.append('file', options.file);
-    const res = await uploadAudio(formData);
+    const res = await offlineUploadAudio(formData);
     handleUploadSuccess(res.data, options.file);
-    // 不再调用 options.onSuccess(res.data);
   } catch (e) {
     handleUploadError(e);
-    // 不再调用 options.onError(e);
   } finally {
     isUploading.value = false;
   }
 };
 
-// 上传前校验
 const beforeUpload = () => {
   if (isUploading.value) {
     ElMessage.warning('正在上传，请稍候');
@@ -99,10 +94,8 @@ const beforeUpload = () => {
   return true;
 };
 
-// 上传成功
 const handleUploadSuccess = (response, file) => {
   isUploading.value = false;
-  // 兼容 el-upload 响应结构
   const resData = response?.audio_path ? response : response?.data;
   if (resData && resData.audio_path) {
     audioPath.value = resData.audio_path;
@@ -113,13 +106,11 @@ const handleUploadSuccess = (response, file) => {
   }
 };
 
-// 上传失败
 const handleUploadError = () => {
   isUploading.value = false;
   ElMessage.error('音频上传失败');
 };
 
-// 识别音频
 const recognize = async () => {
   if (!selectedModel.value || !audioPath.value) {
     ElMessage.error('请先选择模型并上传音频');
@@ -128,7 +119,7 @@ const recognize = async () => {
   isRecognizing.value = true;
   transcription.value = '';
   try {
-    const res = await recognizeAudio({
+    const res = await offlineRecognizeAudio({
       model_name: selectedModel.value,
       audio_path: audioPath.value
     });

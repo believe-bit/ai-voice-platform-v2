@@ -91,7 +91,13 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getModels, uploadDataset, startAsrTrain, stopAsrTrain, getAsrTrainLog } from '../api';
+import {
+  asrFtGetModels,
+  asrFtUploadDataset,
+  asrFtStartTrain,
+  asrFtStopTrain,
+  asrFtGetTrainLog
+} from '@/api';
 
 // 状态管理
 const models = ref([]);
@@ -121,7 +127,7 @@ const logDisplay = computed(() => logs.value.join('\n'));
 // 获取模型列表
 const fetchModels = async () => {
   try {
-    const response = await getModels();
+    const response = await asrFtGetModels();
     console.log('Response from /api/models:', response);
     models.value = response.data.models || [];
     if (models.value.length === 0) {
@@ -153,7 +159,7 @@ const handleUploadRequest = async (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
   try {
-    const response = await uploadDataset(formData);
+    const response = await asrFtUploadDataset(formData);
     console.log('Upload response:', response);
     return response.data;
   } catch (error) {
@@ -196,40 +202,52 @@ const startTraining = async () => {
     return;
   }
   isTraining.value = true;
-  logs.value = [];
+  logs.value = []; // 清空前端日志
   outputDir.value = '';
 
   try {
-    eventSource = getAsrTrainLog();
+    // 关闭现有 EventSource
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+
+    eventSource = asrFtGetTrainLog();
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      logs.value.push(data.message);
-      if (data.message.includes('训练完成') || data.message.includes('训练失败') || data.message.includes('训练已停止')) {
-        eventSource.close();
-        eventSource = null;
-        isTraining.value = false;
-        if (data.message.includes('训练完成')) {
-          const match = data.message.match(/微调模型已保存至 (.+)/);
-          if (match) {
-            outputDir.value = match[1];
+      try {
+        const data = JSON.parse(event.data);
+        logs.value.push(data.message);
+        if (data.message.includes('训练完成') || data.message.includes('训练失败') || data.message.includes('训练已停止')) {
+          eventSource.close();
+          eventSource = null;
+          isTraining.value = false;
+          if (data.message.includes('训练完成')) {
+            const match = data.message.match(/Training completed, model saved to (.+)/);
+            if (match) {
+              outputDir.value = match[1];
+            }
+            ElMessage.success('训练完成');
+          } else if (data.message.includes('训练已停止')) {
+            ElMessage.warning('训练已停止');
+          } else {
+            ElMessage.error('训练失败');
           }
-          ElMessage.success('训练完成');
-        } else if (data.message.includes('训练已停止')) {
-          ElMessage.warning('训练已停止');
-        } else {
-          ElMessage.error('训练失败');
         }
+      } catch (e) {
+        console.error('解析日志失败:', e);
+        logs.value.push(`解析日志失败: ${e.message}`);
       }
     };
     eventSource.onerror = () => {
-      eventSource.close();
-      eventSource = null;
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
       isTraining.value = false;
       ElMessage.error('训练连接中断');
     };
 
-    // 发送训练请求
-    await startAsrTrain({
+    await asrFtStartTrain({
       model_name: form.model_name,
       dataset_path: form.dataset_path,
       training_params: form.training_params,
@@ -247,8 +265,13 @@ const startTraining = async () => {
 // 停止训练
 const stopTraining = async () => {
   try {
-    const response = await stopAsrTrain();
+    const response = await asrFtStopTrain();
     ElMessage.success(response.data.message);
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    isTraining.value = false;
   } catch (error) {
     ElMessage.error('停止训练失败：' + error.message);
   }
