@@ -48,7 +48,6 @@ export const recognizeAudio = (data) => {
 
 
 /* ===== ASR 微调专用（追加，不影响原有） ===== */
-/* ===== ASR 微调专用（追加，不影响原有） ===== */
 export const asrFtGetModels = () => api.get('/models');
 
 export const asrFtUploadDataset = (formData) =>
@@ -63,4 +62,14 @@ export const asrFtStopTrain = () => api.post('/asr_stop'); // 修改为新的 /a
 export const asrFtGetTrainLog = () =>
   new EventSource(`${API_BASE_URL}/api/asr_train_logs`);
 
+
+/* ===== 离线音频识别专用（追加，不影响原有） ===== */
+export const offlineGetAsrModels = () => api.get('/offline_models');
+
+export const offlineUploadAudio = (formData) =>
+  api.post('/offline_upload_audio', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+export const offlineRecognizeAudio = (data) => api.post('/offline_recognize', data);
 
