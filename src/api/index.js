@@ -12,6 +12,7 @@ export const uploadVitsDataset = (formData) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 300000, // 修改：增加上传超时到300秒
   });
 };
 
@@ -53,7 +54,9 @@ export const asrFtGetModels = () => api.get('/models');
 export const asrFtUploadDataset = (formData) =>
   api.post('/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 300000, // 修改：增加上传超时到300秒
   });
+
 
 export const asrFtStartTrain = (data) => api.post('/asr_train', data);
 
@@ -73,3 +76,14 @@ export const offlineUploadAudio = (formData) =>
 
 export const offlineRecognizeAudio = (data) => api.post('/offline_recognize', data);
 
+/* ===== 语音合成专用（追加，不影响原有） ===== */
+
+export const synthesizeSpeech = (formData) =>
+  api.post('/synthesize_speech', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  });
+
+export const getCustomLanguages = () => api.get('/custom_languages');
+
+export const saveCustomLanguage = (data) => api.post('/save_language', data);
