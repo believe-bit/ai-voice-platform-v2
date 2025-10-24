@@ -28,18 +28,18 @@
               <el-icon><Phone /></el-icon>
               <span>语音合成</span>
             </el-menu-item>
-            <el-menu-item index="/voice-clone">
+            <!-- <el-menu-item index="/voice-clone">
               <el-icon><CopyDocument /></el-icon>
               <span>语音克隆</span>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/vits-train">
               <el-icon><Platform /></el-icon>
               <span>VITS模型训练</span>
             </el-menu-item>
-            <el-menu-item index="/model-management">
+            <!-- <el-menu-item index="/model-management">
               <el-icon><Folder /></el-icon>
               <span>模型管理</span>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/experiment-projects">
               <el-icon><Notebook /></el-icon>
               <span>实验项目</span>
@@ -61,7 +61,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { House, Microphone, Document, Setting, Phone, CopyDocument, Platform, Folder, Notebook, Tools } from '@element-plus/icons-vue';
+import { House, Microphone, Document, Setting, Phone, Platform, Notebook, Tools } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const activePath = ref(route.path);

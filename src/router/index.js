@@ -11,11 +11,11 @@ const ASRFinetune = () => import('../views/ASRFinetune.vue');
 // 语音合成
 const SpeechSynthesis = () => import('../views/SpeechSynthesis.vue');
 // 语音克隆
-const VoiceClone = () => import('../views/VoiceClone.vue');
+// const VoiceClone = () => import('../views/VoiceClone.vue');
 // VITS模型训练
 const VITSTrain = () => import('../views/VITSTrain.vue');
 // 模型管理
-const ModelManagement = () => import('../views/ModelManagement.vue');
+// const ModelManagement = () => import('../views/ModelManagement.vue');
 // 实验项目
 const ExperimentProjects = () => import('../views/ExperimentProjects.vue');
 // 系统管理
@@ -27,9 +27,9 @@ const routes = [
   { path: '/offline-audio-recognition', component: OfflineAudioRecognition },
   { path: '/asr-finetune', component: ASRFinetune },
   { path: '/speech-synthesis', component: SpeechSynthesis },
-  { path: '/voice-clone', component: VoiceClone },
+  // { path: '/voice-clone', component: VoiceClone },
   { path: '/vits-train', component: VITSTrain },
-  { path: '/model-management', component: ModelManagement },
+  // { path: '/model-management', component: ModelManagement },
   { path: '/experiment-projects', component: ExperimentProjects },
   { path: '/system-management', component: SystemManagement }
 ];
