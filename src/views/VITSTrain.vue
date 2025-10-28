@@ -128,6 +128,13 @@ const beforeUpload = (file) => {
 };
 
 const customUpload = async (options) => {
+  /******** 临时阻断：调试完成后可删除 start ********/
+  if (!options.file || options.file.size === 0) {
+    console.warn('[VITSTrain] 空文件被忽略，防止 ExperimentProjects 页面 400');
+    return;   // 直接返回，不发请求
+  }
+  /******** 临时阻断 end ********/
+
   isUploading.value = true;
   try {
     const formData = new FormData();
@@ -190,7 +197,8 @@ const confirmParams = async () => {
       ElMessage.error(res.data.error || '参数确认失败');
     }
   } catch (e) {
-    handleError(e);
+    console.error('[ExperimentProjects] 加载失败详情：', e);
+    ElMessage.error('加载失败：' + (e.response?.data?.error || e.message || '未知错误'));
   }
 };
 
