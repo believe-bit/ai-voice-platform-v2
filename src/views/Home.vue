@@ -1,13 +1,27 @@
-<!-- 示例视图组件：views/Home.vue (其他视图类似，只需替换标题和内容) -->
+<!-- src/views/Home.vue -->
 <template>
-  <div>
-    <h2>欢迎来到AI智能语音实训平台</h2>
-    <p>这是首页，后续添加具体功能。</p>
-  </div>
+    <div class="home-container">
+        <h2>欢迎来到AI智能语音实训平台</h2>
+        <p>这是首页，后续添加具体功能。</p>
+    </div>
 </template>
 
-<script>
-export default {
-  name: 'HomePage'
-};
+<script setup>
+// 后续添加功能逻辑
 </script>
+
+<style scoped>
+.home-container {
+    text-align: center;
+    padding: 20px;
+}
+h2 {
+    color: #409EFF;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+p {
+    font-size: 16px;
+    color: #666;
+}
+</style>
