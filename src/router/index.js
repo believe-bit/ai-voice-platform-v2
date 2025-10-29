@@ -1,42 +1,53 @@
+// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-
-// 首页
-const Home = () => import('../views/Home.vue');
-// 语音识别
-const SpeechRecognition = () => import('../views/SpeechRecognition.vue');
-// 离线音频文件识别
-const OfflineAudioRecognition = () => import('../views/OfflineAudioRecognition.vue');
-// ASR模型微调
-const ASRFinetune = () => import('../views/ASRFinetune.vue');
-// 语音合成
-const SpeechSynthesis = () => import('../views/SpeechSynthesis.vue');
-// 语音克隆
-// const VoiceClone = () => import('../views/VoiceClone.vue');
-// VITS模型训练
-const VITSTrain = () => import('../views/VITSTrain.vue');
-// 模型管理
-// const ModelManagement = () => import('../views/ModelManagement.vue');
-// 实验项目
-const ExperimentProjects = () => import('../views/ExperimentProjects.vue');
-// 系统管理
-const SystemManagement = () => import('../views/SystemManagement.vue');
+import Login from '../views/Login.vue';
+import Dashboard from '../views/Dashboard.vue';
+import SpeechRecognition from '../views/SpeechRecognition.vue';
+import OfflineAudioRecognition from '../views/OfflineAudioRecognition.vue';
+import ASRFinetune from '../views/ASRFinetune.vue';
+import SpeechSynthesis from '../views/SpeechSynthesis.vue';
+import VITSTrain from '../views/VITSTrain.vue';
+import ExperimentProjects from '../views/ExperimentProjects.vue';
+import SystemManagement from '../views/SystemManagement.vue';
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/speech-recognition', component: SpeechRecognition },
-  { path: '/offline-audio-recognition', component: OfflineAudioRecognition },
-  { path: '/asr-finetune', component: ASRFinetune },
-  { path: '/speech-synthesis', component: SpeechSynthesis },
-  // { path: '/voice-clone', component: VoiceClone },
-  { path: '/vits-train', component: VITSTrain },
-  // { path: '/model-management', component: ModelManagement },
-  { path: '/experiment-projects', component: ExperimentProjects },
-  { path: '/system-management', component: SystemManagement }
+    { path: '/login', component: Login },
+    { path: '/', component: Dashboard, meta: { requiresAuth: true } },
+    { path: '/speech-recognition', component: SpeechRecognition, meta: { requiresAuth: true } },
+    { path: '/offline-audio-recognition', component: OfflineAudioRecognition, meta: { requiresAuth: true } },
+    { path: '/asr-finetune', component: ASRFinetune, meta: { requiresAuth: true } },
+    { path: '/speech-synthesis', component: SpeechSynthesis, meta: { requiresAuth: true } },
+    { path: '/vits-train', component: VITSTrain, meta: { requiresAuth: true } },
+    { path: '/experiment-projects', component: ExperimentProjects, meta: { requiresAuth: true } },
+    { path: '/system-management', component: SystemManagement, meta: { requiresAuth: true } },
+    { path: '/:pathMatch(.*)*', redirect: '/login' },
+    {path: '/speech',component: () => import('@/views/SpeechRecognition.vue')}
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+    history: createWebHistory(process.env.BASE_URL),
+    routes
+});
+
+// src/router/index.js
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    // 未登录，且当前不是登录页 → 跳登录
+    if (to.path !== '/login') {
+      next('/login');
+    } else {
+      next(); // 已经在登录页，放行
+    }
+  } else {
+    // 已登录，且访问登录页 → 跳首页
+    if (to.path === '/login') {
+      next('/');
+    } else {
+      next(); // 放行
+    }
+  }
 });
 
 export default router;
